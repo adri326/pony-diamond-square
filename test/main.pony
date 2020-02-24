@@ -10,11 +10,13 @@ actor Main
     env.out.print("Ohi!")
     let promise = Promise[DSResult]
     promise.next[None](recover iso DSFulfill(env) end)
+    let width = try env.args(1)?.usize()? else 15 end
+    let height = try env.args(2)?.usize()? else 15 end
     DiamondSquare(
-      30, 11,
-      recover iso [as F64: 1; 0.5; 0.1; 0] end,
+      width, height,
+      recover iso [as F64: 0.05; 0.1; 0.3; 0.3; 0.7; 0.5; 0.2] end,
       (Time.nanos(), 64),
-      1
+      2
     )(promise)
 
 class DSFulfill is Fulfill[DSResult, None]
@@ -30,7 +32,7 @@ class DSFulfill is Fulfill[DSResult, None]
         if n < 0 then n = 0
         elseif n > 9 then n = 9
         end
-        _env.out.write(n.string().trim(0, 1))
+        _env.out.write(try [as String: " "; "_"; "-"; "~"; "="; "^"; "ʌ"; "Λ"; "A"; "Å"](n.usize())? else "" end)
       end
       _env.out.write("\n")
     end

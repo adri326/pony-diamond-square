@@ -13,7 +13,7 @@ actor DiamondSquare
   let _seed_x: U64
   let _seed_y: U64
 
-  new create(width': USize, height': USize, weights': Array[F64] iso, seed: ((U64, U64) | U64 | None), multiplier': F64, aliasing': Bool = false) =>
+  new create(width': USize, height': USize, weights': Array[F64] iso, seed: ((U64, U64) | U64 | None), multiplier': F64 = 1, aliasing': Bool = false) =>
     width = width'
     height = height'
     weights = consume weights'
@@ -69,11 +69,6 @@ class _DiamondSquareWorker
     from: (USize, USize),
     to: (USize, USize)
   )? =>
-    let weight = try
-        if depth >= weights.size() then weights(weights.size() - 1)? else weights(depth)? end
-      else
-        0
-      end
     let width' = to._1 - from._1
     let height' = to._2 - from._2
     let center_horizontal = (from._1 + to._1) / 2
@@ -86,24 +81,24 @@ class _DiamondSquareWorker
 
     if width' > 1 then
       top = sample(
-        weight, width'.f64(),
+        width'.f64(),
         (center_horizontal, from._2),
         (_get(from._1, from._2) + _get(to._1, from._2)) / 2
       )?
       bottom = sample(
-        weight, width'.f64(),
+        width'.f64(),
         (center_horizontal, to._2),
         (_get(from._1, to._2) + _get(to._1, to._2)) / 2
       )?
     end
     if height' > 1 then
       left = sample(
-        weight, height'.f64(),
+        height'.f64(),
         (from._1, center_vertical),
         (_get(from._1, from._2) + _get(from._1, to._2)) / 2
       )?
       right = sample(
-        weight, height'.f64(),
+        height'.f64(),
         (to._1, center_vertical),
         (_get(to._1, from._2) + _get(to._1, to._2)) / 2
       )?
@@ -111,7 +106,7 @@ class _DiamondSquareWorker
     if ((width' > 1) and (height' > 1)) or (width' > 2) or (height' > 2) then
       // Debug("Hi!")
       sample(
-        weight, ((width' * width') + (height' * height')).f64().sqrt(),
+        ((width' * width') + (height' * height')).f64().sqrt(),
         (center_horizontal, center_vertical),
         (top + bottom + left + right) / 4
       )?
@@ -122,11 +117,21 @@ class _DiamondSquareWorker
     end
 
   fun ref sample(
-    weight: F64,
     dist: F64,
     position: (USize, USize),
     mean: F64
   ): F64? =>
+    let weight = try // assume(dist > 1)
+        let int = dist.floor()
+        let rem = dist - int
+        if rem == 0 then
+          weights(rem.usize())?
+        else
+          (weights(rem.usize())? * (1 - rem)) + (weights(rem.usize() + 1)? * rem)
+        end
+      else
+        0
+      end * multiplier
     let bias = ((rng.real() * 2) - 1) * weight // returns a number between [-weight; weight]
     // Debug(weight.string() + " " + bias.string())
     tiles(position._2)?(position._1)? = mean + bias
