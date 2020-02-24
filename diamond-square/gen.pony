@@ -13,7 +13,7 @@ actor DiamondSquare
   let _seed_x: U64
   let _seed_y: U64
 
-  new create(width': USize, height': USize, weights': Array[F64] iso, seed: ((U64, U64) | U64 | None), multiplier': F64 = 1, aliasing': Bool = false) =>
+  new create(width': USize, height': USize, weights': Array[F64] iso, seed: ((U64, U64) | U64 | None), multiplier': F64 = 1) =>
     width = width'
     height = height'
     weights = consume weights'
