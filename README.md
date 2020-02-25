@@ -4,7 +4,7 @@ Tiny library implementing the [diamond-square heightmap generation algorithm](ht
 
 ## Installation
 
-Include this library in [`stable`](https://github.com/ponylang/stable):
+Include this library in your project config:
 
 ```json
 {
@@ -13,7 +13,9 @@ Include this library in [`stable`](https://github.com/ponylang/stable):
 }
 ```
 
-Include this library in your code:
+Or add it with `stable add github adri326/pony-diamond-square`
+
+Then include it in your code:
 
 ```pony
 use "diamond-square"
