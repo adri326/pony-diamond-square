@@ -38,3 +38,9 @@ promise.next[None](recover iso FulfillClass end)
 DiamondSquare(width, height, weight_array_as_f64, (noise_seed_a, noise_seed_b), multiplier)(promise)
 ```
 
+## Notes
+
+This is a slightly modified version of the diamond-square algorithm, which lets you run it on arbitrarily-sized maps, instead of the fixed `2^n + 1` square that the original implementation needs.
+
+The output is not bound, ie. even with a multiplier of `1`, you might get values above 1.
+Consider using a sigmoid function to address that.

@@ -103,6 +103,7 @@ class _DiamondSquareWorker
         (_get(to._1, from._2) + _get(to._1, to._2)) / 2
       )?
     end
+
     if ((width' > 1) and (height' > 1)) or (width' > 2) or (height' > 2) then
       // Debug("Hi!")
       sample(
@@ -121,21 +122,25 @@ class _DiamondSquareWorker
     position: (USize, USize),
     mean: F64
   ): F64? =>
-    let weight = try // assume(dist > 1)
-        let int = dist.floor()
-        let rem = dist - int
-        if rem == 0 then
-          weights(rem.usize())?
+    if _get(position._1, position._2) == 0 then // keep the already-generated side
+      _get(position._1, position._2)
+    else
+      let weight = try // assume(dist > 1)
+          let int = dist.floor()
+          let rem = dist - int
+          if rem == 0 then
+            weights(rem.usize())?
+          else
+            (weights(rem.usize())? * (1 - rem)) + (weights(rem.usize() + 1)? * rem)
+          end
         else
-          (weights(rem.usize())? * (1 - rem)) + (weights(rem.usize() + 1)? * rem)
-        end
-      else
-        0
-      end * multiplier
-    let bias = ((rng.real() * 2) - 1) * weight // returns a number between [-weight; weight]
-    // Debug(weight.string() + " " + bias.string())
-    tiles(position._2)?(position._1)? = mean + bias
-    mean + bias
+          0
+        end * multiplier
+      let bias = ((rng.real() * 2) - 1) * weight // returns a number between [-weight; weight]
+      // Debug(weight.string() + " " + bias.string())
+      tiles(position._2)?(position._1)? = mean + bias
+      mean + bias
+    end
 
   fun ref _get(x: USize, y: USize): F64 =>
     if \unlikely\ (x >= width) or (y >= height) then
